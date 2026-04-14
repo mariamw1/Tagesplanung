@@ -587,7 +587,7 @@ function renderRoutineFilters() {
 
 function renderRoutine() {
   const visibleSections = getVisibleRoutineSections();
-  const visibleSteps = visibleSections.flatMap((section) => section.steps);
+  const visibleSteps = visibleSections.reduce((allSteps, section) => allSteps.concat(section.steps), []);
   const completedVisibleSteps = visibleSteps.filter((step) => state.completedSteps.includes(step.id));
   const progress = visibleSteps.length === 0 ? 0 : Math.round((completedVisibleSteps.length / visibleSteps.length) * 100);
 
@@ -858,11 +858,11 @@ function formatTime(date) {
 
 function formatICSDate(date) {
   const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  const hours = String(date.getHours()).padStart(2, "0");
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-  const seconds = String(date.getSeconds()).padStart(2, "0");
+  const month = padTwo(date.getMonth() + 1);
+  const day = padTwo(date.getDate());
+  const hours = padTwo(date.getHours());
+  const minutes = padTwo(date.getMinutes());
+  const seconds = padTwo(date.getSeconds());
 
   return `${year}${month}${day}T${hours}${minutes}${seconds}`;
 }
@@ -877,6 +877,11 @@ function cloneRoutineSections(sections) {
 
 function cloneScheduleSegments(segments) {
   return JSON.parse(JSON.stringify(segments));
+}
+
+function padTwo(value) {
+  const stringValue = String(value);
+  return stringValue.length < 2 ? `0${stringValue}` : stringValue;
 }
 
 function normalizeRoutineSections(sections) {
@@ -923,13 +928,13 @@ function normalizeScheduleSegments(segments) {
 
 function escapeHtml(value) {
   return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
 function escapeAttribute(value) {
-  return escapeHtml(value).replaceAll("\n", " ");
+  return escapeHtml(value).replace(/\n/g, " ");
 }
