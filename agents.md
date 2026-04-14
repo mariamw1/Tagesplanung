@@ -138,6 +138,7 @@ Pflicht für alle nachfolgenden Agents:
 - Geladene Sitzungsdaten für Zeitplanung und Routine werden robuster normalisiert, damit leere oder ältere Zustände die Oberfläche nicht mehr so leicht aushebeln.
 - Der Kopfbereich oben wurde breiter geöffnet, damit Überschrift und Einführungstext nicht mehr so zusammengedrückt wirken.
 - Zusätzlich wurde die maximale Seitenbreite erhöht, damit der Einführungstext oben deutlich freier über die verfügbare Breite laufen kann.
+- Die feste Zeichenbegrenzung der großen Überschrift im Kopfbereich wurde entfernt, damit der Titel selbst nicht mehr unnötig schmal umbrechen muss.
 - Die Routine ist jetzt wieder klarer nach Räumen und realem Ablauf gegliedert.
 - Die Schritte sind konkreter formuliert und können in der Oberfläche direkt bearbeitet, ergänzt, gelöscht und umsortiert werden.
 - Sichtbare Routine-Schritte zeigen nur die eigentlichen Handlungen; die Zuordnung zu Vollroutine, Minimalroutine und später nachholbaren Schritten steuert nur die Auswahl der Ansicht.
