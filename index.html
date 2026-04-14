@@ -1,13 +1,121 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="de">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Flexible Wochenroutine</title>
-    <script type="module" crossorigin src="./assets/index-Dl1qrOhJ.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-BvWWfQD0.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f4efe6">
+  <title>Tagesplanung</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="hero">
+      <p class="eyebrow">Tagesplanung</p>
+      <h1>Einfach planen, ohne morgens viel nachdenken zu müssen.</h1>
+      <p class="intro">
+        Diese Version verbindet Zeitplanung und Routinen auf einer gemeinsamen
+        Startseite. Alles bleibt bewusst einfach, schnell erreichbar und nur so
+        komplex wie für einen guten Proof of Concept nötig.
+      </p>
+    </header>
+
+    <nav class="tabs" aria-label="Bereiche">
+      <button class="tab-button is-active" type="button" data-tab-target="planung">Zeitplanung</button>
+      <button class="tab-button" type="button" data-tab-target="routine">Routinen</button>
+    </nav>
+
+    <section class="panel is-active" data-tab-panel="planung">
+      <div class="card">
+        <div class="section-head">
+          <div>
+            <h2>Zeitplanung</h2>
+            <p>Gesamtzeit eingeben, Prozentverteilung anpassen und direkt in Minuten sehen.</p>
+          </div>
+        </div>
+
+        <div class="planning-grid">
+          <label class="field">
+            <span>Gesamtzeit in Minuten</span>
+            <input id="total-minutes" type="number" min="0" step="5" value="180">
+          </label>
+
+          <label class="field">
+            <span>Hauptfokus %</span>
+            <input id="percent-main" type="number" min="0" max="100" step="5" value="50">
+          </label>
+
+          <label class="field">
+            <span>Nebenfokus %</span>
+            <input id="percent-side" type="number" min="0" max="100" step="5" value="20">
+          </label>
+
+          <label class="field">
+            <span>Pausen %</span>
+            <input id="percent-breaks" type="number" min="0" max="100" step="5" value="10">
+          </label>
+
+          <label class="field">
+            <span>Bewegung oder Abwechslung %</span>
+            <input id="percent-balance" type="number" min="0" max="100" step="5" value="10">
+          </label>
+
+          <label class="field">
+            <span>Pufferzeit %</span>
+            <input id="percent-buffer" type="number" min="0" max="100" step="5" value="10">
+          </label>
+        </div>
+
+        <div id="percent-summary" class="summary-box" aria-live="polite"></div>
+
+        <div class="button-row">
+          <button id="calculate-button" class="primary-button" type="button">Zeit berechnen</button>
+          <button id="reset-planning-button" type="button">Standardwerte einsetzen</button>
+        </div>
+
+        <div id="planning-results" class="result-list" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="panel" data-tab-panel="routine">
+      <div class="card">
+        <div class="section-head">
+          <div>
+            <h2>Routinen</h2>
+            <p>Eine Master-Routine mit klaren Schritten, geordnet nach realem Ablauf und Räumen.</p>
+          </div>
+          <button id="toggle-edit-mode" type="button">Bearbeiten</button>
+        </div>
+
+        <div class="routine-toolbar">
+          <div id="routine-filter-buttons" class="chip-row" role="tablist" aria-label="Routine-Ansicht"></div>
+          <div class="toolbar-actions">
+            <button id="reset-routine-button" type="button">Haken zurücksetzen</button>
+          </div>
+        </div>
+
+        <div class="progress-box">
+          <div class="progress-track">
+            <div id="routine-progress-bar" class="progress-fill"></div>
+          </div>
+          <p id="routine-progress-text">0 von 0 Schritten erledigt</p>
+        </div>
+
+        <div id="edit-panel" class="edit-panel is-hidden">
+          <div class="edit-panel-head">
+            <div>
+              <h3>Routine bearbeiten</h3>
+              <p>Raumtitel und Schritte lassen sich direkt hier anpassen. Alles bleibt nur für diese Sitzung erhalten.</p>
+            </div>
+            <button id="add-section-button" type="button">Raum hinzufügen</button>
+          </div>
+          <div id="editor-sections" class="editor-sections"></div>
+        </div>
+
+        <div id="routine-sections" class="routine-sections"></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
 </html>

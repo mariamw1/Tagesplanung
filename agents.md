@@ -26,7 +26,7 @@ Pflicht für alle nachfolgenden Agents:
 - Lokal lag zum Neustart nur diese Datei vor.
 - Das Ziel-Repository existiert bereits, war für diesen Neustart aber inhaltlich leer.
 - Frühere Notizen zu Tabs, Zeitplanung, Routinen, Session-Storage und bearbeitbaren Listen bleiben als Produktüberlegungen relevant, beschreiben aber nicht mehr den aktuellen Code-Stand.
-- Der aktuelle Fokus ist eine absolute Minimalversion als veröffentlichbarer Proof of Concept.
+- Der aktuelle Fokus ist ein einfacher, statischer Proof of Concept, der bereits wieder erste echte Fachlogik enthält.
 
 ## Aktueller Projektkontext
 
@@ -56,17 +56,18 @@ Pflicht für alle nachfolgenden Agents:
 
 ### Aktueller Minimalumfang
 
-- Die erste tatsächlich umgesetzte Neustart-Version enthält nur eine Überschrift und einen Textblock.
-- Es gibt noch keine Zeitplanung.
-- Es gibt noch keine Routinenlogik.
-- Es gibt noch keine lokale Speicherung.
-- Es gibt noch keine Tabs oder weiteren Unterseiten.
-- Die erste sichtbare Seite ist rein deutschsprachig und bewusst minimal.
+- Die aktuelle Version enthält wieder eine zentrale Startseite mit zwei Tabs.
+- Die Zeitplanung ist der Hauptbereich und wird beim Öffnen zuerst gezeigt.
+- Die Routinen liegen direkt auf derselben Seite in einem zweiten Tab.
+- Es gibt weiterhin kein Backend und keine dauerhafte Speicherung.
+- Der Zustand wird nur temporär über `sessionStorage` gehalten.
+- Die Seite ist deutschsprachig, statisch und bewusst einfach gehalten.
 
 ### Empfohlene Projektdateien für diese Phase
 
 - `index.html` enthält die sichtbare Minimaloberfläche.
 - `styles.css` enthält Layout, Farben und responsive Darstellung.
+- `app.js` enthält die Logik für Interaktionen, Zeitplanung und Routinen.
 - `README.md` dokumentiert Zweck, Start und Veröffentlichungsweg.
 - `.gitignore` schließt lokale Systemdateien wie `.DS_Store` vom Repository aus.
 - `.nojekyll` verhindert bei GitHub Pages eine unnötige Jekyll-Verarbeitung.
@@ -96,8 +97,8 @@ Pflicht für alle nachfolgenden Agents:
 - Der lokale Projektordner wurde nach dem Neustart erneut als Git-Repository initialisiert.
 - Das Repository ist jetzt wieder mit `origin` auf `https://github.com/mariamw1/Tagesplanung.git` verbunden und der aktuelle Stand liegt auf `main`.
 - GitHub Pages ist aktiv und veröffentlicht die Seite unter `https://mariamw1.github.io/Tagesplanung/`.
-- Als nächster Test wurde die vorherige Version des Projekts als fertiger statischer Build aus `/Users/maria/Desktop/Flexible Wochenroutine/docs` in dieses Repository übernommen.
-- Die spätere inhaltliche Struktur für Zeitplanung und Routinen bleibt offen.
+- Die vorherige Build-Version wurde inzwischen wieder durch eine bewusst einfache statische Projektstruktur ersetzt.
+- Die spätere inhaltliche Struktur für Zeitplanung und Routinen bleibt offen, ist aber jetzt näher an den dokumentierten Produktideen.
 - Die genaue Form des Schnellzugriffs auf iPhone, iPad und Mac wird erst relevant, sobald eine feste URL aktiv ist.
 
 ## Geklärte Produktentscheidungen
@@ -107,12 +108,14 @@ Pflicht für alle nachfolgenden Agents:
 - Die erste veröffentlichbare Version soll nur zeigen, dass die URL, die Auslieferung und die Grundstruktur funktionieren.
 - Die Seite soll deutschsprachig, ruhig und minimalistisch sein.
 - GitHub Pages bleibt der naheliegende erste Hosting-Weg.
-- Spätere Funktionen wie Zeitplanung, Routinen, Filterlogik oder Speicherung gehören ausdrücklich nicht in diese erste Neustart-Version.
+- Die technische Basis soll bewusst wieder statisch und einfach lesbar sein, also bevorzugt `index.html`, `styles.css` und `app.js`.
+- Temporäre Zustände sollen nur sitzungsbezogen erhalten bleiben, nicht dauerhaft.
 
 ## Bisher umgesetzt
 
-- `index.html` wurde als minimale Startseite mit einer Überschrift und einem Textblock angelegt.
-- `styles.css` wurde als kleine responsive Gestaltungsbasis angelegt.
+- `index.html` wurde zu einer zentralen Startseite mit Tabs für Zeitplanung und Routinen ausgebaut.
+- `styles.css` wurde zu einem responsiven Layout für Startseite, Kartenbereiche, Routinen und Bearbeitungsmodus erweitert.
+- `app.js` wurde angelegt und enthält die Logik für Tab-Wechsel, Zeitplanung, Routinen, Fortschritt, Bearbeitungsmodus und `sessionStorage`.
 - `.gitignore` wurde ergänzt, damit lokale Systemdateien nicht mit veröffentlicht werden.
 - `.nojekyll` wurde ergänzt.
 - `README.md` wurde für die Neustart-Version angelegt.
@@ -122,18 +125,23 @@ Pflicht für alle nachfolgenden Agents:
 - Die lokalen Commits wurden erfolgreich nach `origin/main` veröffentlicht.
 - GitHub Actions hat die Pages-Bereitstellung erfolgreich ausgeführt.
 - Die öffentliche Proof-of-Concept-URL ist `https://mariamw1.github.io/Tagesplanung/`.
-- Für den Kontotest wurde die Minimal-Startseite anschließend durch den statischen Build der vorherigen Version ersetzt.
-- Dieser Import besteht aktuell aus `index.html` sowie den gebauten Dateien im Ordner `assets/`.
+- Für den Kontotest wurde zwischenzeitlich eine vorherige Build-Version importiert; diese wurde anschließend wieder durch die einfache statische Projektstruktur ersetzt.
+- Die Zeitplanung startet jetzt mit `50 / 20 / 10 / 10 / 10` und prüft weiterhin, ob die Summe genau `100 %` ergibt.
+- Die Routine ist jetzt wieder klarer nach Räumen und realem Ablauf gegliedert.
+- Die Schritte sind konkreter formuliert und können in der Oberfläche direkt bearbeitet, ergänzt, gelöscht und umsortiert werden.
+- Sichtbare Routine-Schritte zeigen nur die eigentlichen Handlungen; die Zuordnung zu Vollroutine, Minimalroutine und später nachholbaren Schritten steuert nur die Auswahl der Ansicht.
+- Die aktuellen Eingaben, der aktive Tab, die gesetzten Haken, der Bearbeitungsmodus und die bearbeitete Routine bleiben nur für die aktuelle Sitzung über `sessionStorage` erhalten.
 
 ## Nächste sinnvolle Schritte
 
 - Die öffentliche URL auf den gewünschten Geräten testen.
-- Danach entscheiden, ob als Nächstes Inhalt, Design oder erste echte Fachlogik ergänzt werden soll.
+- Prüfen, ob die aktuelle Routinenlogik und die Formulierungen im Alltag schon nah genug am realen Morgenablauf sind.
+- Danach entscheiden, ob als Nächstes Inhalt, Design oder weitere Fachlogik ergänzt werden soll.
 - Danach bei Bedarf schrittweise die erste echte Fachlogik ergänzen.
 
 ## Dinge, die der Nutzer selbst erledigen soll
 
-- Im Browser prüfen, ob die Minimalseite inhaltlich und visuell als Startpunkt passt.
+- Im Browser prüfen, ob Zeitplanung, Tab-Wechsel, Routine-Haken und Bearbeitungsmodus wie gewünscht funktionieren.
 - Die veröffentlichte URL auf iPhone, iPad und Mac öffnen und testen.
 - Einen Startbildschirm-Link oder vergleichbaren Schnellzugriff einrichten, sobald die feste URL funktioniert.
 
@@ -142,3 +150,7 @@ Pflicht für alle nachfolgenden Agents:
 - Wenn ein neuer Schritt nur mit GitHub-Berechtigungen des Nutzers möglich ist, soll das klar als manueller Schritt dokumentiert werden.
 - Manuelle Schritte sollen von technischen Umsetzungsaufgaben der Agents getrennt festgehalten werden.
 - Wenn spätere Features aus den historischen Produktüberlegungen wieder aufgenommen werden, soll klar dokumentiert werden, ab wann sie wieder Teil des tatsächlichen Code-Stands sind.
+
+# Weitere Ideen von User
+- Weitere Seite: Braindump/-cleanse -> Sammle Ideen und Gedanken, die ich gerade nicht angehen kann, aber an die ich mich erinnern will
+evtl. dazu dann auch eine Funktion, die diese Schnipsel/ToDos auf Obsidian oder Erinnerungen übertragen kann (angelehnt an die Funktion von Zeitblockplanung, dass man daraus eine ics datei machen kann)
