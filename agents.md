@@ -96,6 +96,7 @@ Pflicht für alle nachfolgenden Agents:
 - Der lokale Projektordner wurde nach dem Neustart erneut als Git-Repository initialisiert.
 - Das Repository ist jetzt wieder mit `origin` auf `https://github.com/mariamw1/Tagesplanung.git` verbunden und der aktuelle Stand liegt auf `main`.
 - GitHub Pages ist aktiv und veröffentlicht die Seite unter `https://mariamw1.github.io/Tagesplanung/`.
+- Als nächster Test wurde die vorherige Version des Projekts als fertiger statischer Build aus `/Users/maria/Desktop/Flexible Wochenroutine/docs` in dieses Repository übernommen.
 - Die spätere inhaltliche Struktur für Zeitplanung und Routinen bleibt offen.
 - Die genaue Form des Schnellzugriffs auf iPhone, iPad und Mac wird erst relevant, sobald eine feste URL aktiv ist.
 
@@ -121,7 +122,8 @@ Pflicht für alle nachfolgenden Agents:
 - Die lokalen Commits wurden erfolgreich nach `origin/main` veröffentlicht.
 - GitHub Actions hat die Pages-Bereitstellung erfolgreich ausgeführt.
 - Die öffentliche Proof-of-Concept-URL ist `https://mariamw1.github.io/Tagesplanung/`.
-- Die Struktur ist damit auf einen sehr kleinen, klaren Proof of Concept reduziert.
+- Für den Kontotest wurde die Minimal-Startseite anschließend durch den statischen Build der vorherigen Version ersetzt.
+- Dieser Import besteht aktuell aus `index.html` sowie den gebauten Dateien im Ordner `assets/`.
 
 ## Nächste sinnvolle Schritte
 
