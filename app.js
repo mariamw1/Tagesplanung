@@ -1,4 +1,5 @@
 const STORAGE_KEY = "tagesplanung-session";
+const focusOptions = ["Arbeit", "Apostolat", "Lernen", "Programme entwickeln", "Haushalt", "Zimmer", "Orga"];
 
 const defaultPlanning = {
   totalMinutes: 180,
@@ -7,6 +8,9 @@ const defaultPlanning = {
   breaks: 10,
   balance: 10,
   buffer: 10,
+  mainFocus: "Arbeit",
+  sideFocuses: ["Lernen"],
+  balanceLabel: "Bewegung oder Abwechslung",
 };
 
 const defaultRoutineSections = [
@@ -67,15 +71,27 @@ const elements = {
   tabButtons: Array.from(document.querySelectorAll("[data-tab-target]")),
   tabPanels: Array.from(document.querySelectorAll("[data-tab-panel]")),
   totalMinutes: document.getElementById("total-minutes"),
+  totalMinutesRange: document.getElementById("total-minutes-range"),
+  mainFocusOptions: document.getElementById("main-focus-options"),
+  sideFocusOptions: document.getElementById("side-focus-options"),
+  balanceLabel: document.getElementById("balance-label"),
   mainPercent: document.getElementById("percent-main"),
   sidePercent: document.getElementById("percent-side"),
   breaksPercent: document.getElementById("percent-breaks"),
   balancePercent: document.getElementById("percent-balance"),
   bufferPercent: document.getElementById("percent-buffer"),
+  mainPercentLabel: document.getElementById("main-percent-label"),
+  sidePercentLabel: document.getElementById("side-percent-label"),
+  breaksPercentLabel: document.getElementById("breaks-percent-label"),
+  balancePercentLabel: document.getElementById("balance-percent-label"),
+  bufferPercentLabel: document.getElementById("buffer-percent-label"),
   percentSummary: document.getElementById("percent-summary"),
-  calculateButton: document.getElementById("calculate-button"),
+  refreshScheduleButton: document.getElementById("refresh-schedule-button"),
+  exportIcsButton: document.getElementById("export-ics-button"),
   resetPlanningButton: document.getElementById("reset-planning-button"),
   planningResults: document.getElementById("planning-results"),
+  scheduleCaption: document.getElementById("schedule-caption"),
+  scheduleResults: document.getElementById("schedule-results"),
   routineFilterButtons: document.getElementById("routine-filter-buttons"),
   routineSections: document.getElementById("routine-sections"),
   routineProgressBar: document.getElementById("routine-progress-bar"),
@@ -106,7 +122,9 @@ function loadState() {
         ...defaultPlanning,
         ...(parsed.planning || {}),
       },
-      routineSections: Array.isArray(parsed.routineSections) ? parsed.routineSections : cloneRoutineSections(defaultRoutineSections),
+      routineSections: Array.isArray(parsed.routineSections)
+        ? parsed.routineSections
+        : cloneRoutineSections(defaultRoutineSections),
       completedSteps: Array.isArray(parsed.completedSteps) ? parsed.completedSteps : [],
     };
   } catch {
@@ -118,7 +136,7 @@ function createDefaultState() {
   return {
     activeTab: "planung",
     planning: { ...defaultPlanning },
-    planningResults: calculatePlanning(defaultPlanning),
+    scheduleStartTime: new Date().toISOString(),
     routineMode: "full",
     completedSteps: [],
     routineSections: cloneRoutineSections(defaultRoutineSections),
@@ -139,8 +157,21 @@ function bindEvents() {
     });
   });
 
+  elements.totalMinutes.addEventListener("input", (event) => {
+    state.planning.totalMinutes = sanitizeNumber(event.target.value);
+    saveState();
+    syncPlanningInputs();
+    renderPlanning();
+  });
+
+  elements.totalMinutesRange.addEventListener("input", (event) => {
+    state.planning.totalMinutes = sanitizeNumber(event.target.value);
+    saveState();
+    syncPlanningInputs();
+    renderPlanning();
+  });
+
   [
-    ["totalMinutes", "totalMinutes"],
     ["mainPercent", "main"],
     ["sidePercent", "side"],
     ["breaksPercent", "breaks"],
@@ -148,31 +179,35 @@ function bindEvents() {
     ["bufferPercent", "buffer"],
   ].forEach(([elementKey, stateKey]) => {
     elements[elementKey].addEventListener("input", (event) => {
-      const value = Number(event.target.value);
-      state.planning[stateKey] = Number.isFinite(value) ? value : 0;
+      state.planning[stateKey] = sanitizeNumber(event.target.value);
       saveState();
-      renderPlanningSummary();
+      renderPlanning();
     });
   });
 
-  elements.calculateButton.addEventListener("click", () => {
-    if (getPlanningPercentSum() !== 100) {
-      renderPlanningSummary();
-      return;
-    }
-
-    state.planningResults = calculatePlanning(state.planning);
+  elements.balanceLabel.addEventListener("input", (event) => {
+    state.planning.balanceLabel = event.target.value;
     saveState();
-    renderPlanningResults();
+    renderPlanning();
+  });
+
+  elements.refreshScheduleButton.addEventListener("click", () => {
+    state.scheduleStartTime = new Date().toISOString();
+    saveState();
+    renderSchedule();
+  });
+
+  elements.exportIcsButton.addEventListener("click", () => {
+    exportScheduleAsICS();
   });
 
   elements.resetPlanningButton.addEventListener("click", () => {
     state.planning = { ...defaultPlanning };
-    state.planningResults = calculatePlanning(defaultPlanning);
+    state.scheduleStartTime = new Date().toISOString();
     saveState();
     syncPlanningInputs();
-    renderPlanningSummary();
-    renderPlanningResults();
+    renderPlanningFocusOptions();
+    renderPlanning();
   });
 
   elements.resetRoutineButton.addEventListener("click", () => {
@@ -202,8 +237,8 @@ function bindEvents() {
 function renderAll() {
   syncPlanningInputs();
   renderTabs();
-  renderPlanningSummary();
-  renderPlanningResults();
+  renderPlanningFocusOptions();
+  renderPlanning();
   renderRoutineFilters();
   renderRoutine();
   renderEditMode();
@@ -211,11 +246,18 @@ function renderAll() {
 
 function syncPlanningInputs() {
   elements.totalMinutes.value = state.planning.totalMinutes;
+  elements.totalMinutesRange.value = clamp(state.planning.totalMinutes, 30, 360);
+  elements.balanceLabel.value = state.planning.balanceLabel;
   elements.mainPercent.value = state.planning.main;
   elements.sidePercent.value = state.planning.side;
   elements.breaksPercent.value = state.planning.breaks;
   elements.balancePercent.value = state.planning.balance;
   elements.bufferPercent.value = state.planning.buffer;
+  elements.mainPercentLabel.textContent = state.planning.main;
+  elements.sidePercentLabel.textContent = state.planning.side;
+  elements.breaksPercentLabel.textContent = state.planning.breaks;
+  elements.balancePercentLabel.textContent = state.planning.balance;
+  elements.bufferPercentLabel.textContent = state.planning.buffer;
 }
 
 function renderTabs() {
@@ -226,6 +268,54 @@ function renderTabs() {
   elements.tabPanels.forEach((panel) => {
     panel.classList.toggle("is-active", panel.dataset.tabPanel === state.activeTab);
   });
+}
+
+function renderPlanningFocusOptions() {
+  elements.mainFocusOptions.innerHTML = "";
+  elements.sideFocusOptions.innerHTML = "";
+
+  focusOptions.forEach((option) => {
+    const mainButton = document.createElement("button");
+    mainButton.type = "button";
+    mainButton.className = `choice-chip${state.planning.mainFocus === option ? " choice-chip-active" : ""}`;
+    mainButton.textContent = option;
+    mainButton.setAttribute("aria-pressed", String(state.planning.mainFocus === option));
+    mainButton.addEventListener("click", () => {
+      state.planning.mainFocus = option;
+      state.planning.sideFocuses = state.planning.sideFocuses.filter((item) => item !== option);
+      saveState();
+      renderPlanningFocusOptions();
+      renderPlanning();
+    });
+    elements.mainFocusOptions.appendChild(mainButton);
+
+    const isSelected = state.planning.sideFocuses.includes(option);
+    const isDisabled = state.planning.mainFocus === option;
+    const sideButton = document.createElement("button");
+    sideButton.type = "button";
+    sideButton.className = `choice-chip${isSelected ? " choice-chip-active" : ""}${isDisabled ? " choice-chip-disabled" : ""}`;
+    sideButton.textContent = option;
+    sideButton.disabled = isDisabled;
+    sideButton.setAttribute("aria-pressed", String(isSelected));
+    sideButton.addEventListener("click", () => {
+      if (state.planning.sideFocuses.includes(option)) {
+        state.planning.sideFocuses = state.planning.sideFocuses.filter((item) => item !== option);
+      } else {
+        state.planning.sideFocuses = [...state.planning.sideFocuses, option];
+      }
+      saveState();
+      renderPlanningFocusOptions();
+      renderPlanning();
+    });
+    elements.sideFocusOptions.appendChild(sideButton);
+  });
+}
+
+function renderPlanning() {
+  syncPlanningInputs();
+  renderPlanningSummary();
+  renderPlanningResults();
+  renderSchedule();
 }
 
 function getPlanningPercentSum() {
@@ -242,31 +332,48 @@ function renderPlanningSummary() {
 
   if (percentSum === 100) {
     elements.percentSummary.classList.add("is-valid");
-    elements.percentSummary.textContent = "Summe: 100 %. Die Verteilung ist gültig und kann berechnet werden.";
+    elements.percentSummary.textContent = "Summe: 100 %. Die Verteilung ist gültig.";
   } else {
     elements.percentSummary.classList.add("is-invalid");
     elements.percentSummary.textContent = `Summe: ${percentSum} %. Bitte passe die Werte auf genau 100 % an.`;
   }
 }
 
-function calculatePlanning(planning) {
+function getPlanItems() {
   return [
-    { label: "Hauptfokus", note: "Wichtigster Block des Tages", minutes: getMinutes(planning.totalMinutes, planning.main) },
-    { label: "Nebenfokus", note: "Zweiter klarer Arbeitsblock", minutes: getMinutes(planning.totalMinutes, planning.side) },
-    { label: "Pausen", note: "Kurze Unterbrechungen zum Durchatmen", minutes: getMinutes(planning.totalMinutes, planning.breaks) },
-    { label: "Bewegung oder Abwechslung", note: "Kurzer Wechsel für Kopf und Körper", minutes: getMinutes(planning.totalMinutes, planning.balance) },
-    { label: "Pufferzeit", note: "Falls etwas länger dauert als gedacht", minutes: getMinutes(planning.totalMinutes, planning.buffer) },
+    {
+      label: `Hauptfokus: ${state.planning.mainFocus}`,
+      note: "Wichtigster Block des Tages",
+      minutes: getMinutes(state.planning.totalMinutes, state.planning.main),
+    },
+    {
+      label: formatSideFocusLabel(),
+      note: "Zweiter klarer Arbeitsblock",
+      minutes: getMinutes(state.planning.totalMinutes, state.planning.side),
+    },
+    {
+      label: "Pausen",
+      note: "Kurze Unterbrechungen zum Durchatmen",
+      minutes: getMinutes(state.planning.totalMinutes, state.planning.breaks),
+    },
+    {
+      label: state.planning.balanceLabel || "Gegengewicht",
+      note: "Bewegung, Abwechslung oder ein guter Gegenschwerpunkt",
+      minutes: getMinutes(state.planning.totalMinutes, state.planning.balance),
+    },
+    {
+      label: "Puffer",
+      note: "Falls etwas länger dauert als gedacht",
+      minutes: getMinutes(state.planning.totalMinutes, state.planning.buffer),
+    },
   ];
 }
 
-function getMinutes(totalMinutes, percent) {
-  return Math.round((Math.max(0, totalMinutes) * Math.max(0, percent)) / 100);
-}
-
 function renderPlanningResults() {
+  const items = getPlanItems();
   elements.planningResults.innerHTML = "";
 
-  state.planningResults.forEach((item) => {
+  items.forEach((item) => {
     const row = document.createElement("div");
     row.className = "result-item";
     row.innerHTML = `
@@ -278,6 +385,147 @@ function renderPlanningResults() {
     `;
     elements.planningResults.appendChild(row);
   });
+}
+
+function getScheduleSegments() {
+  if (getPlanningPercentSum() !== 100) {
+    return [];
+  }
+
+  const breakMinutes = getMinutes(state.planning.totalMinutes, state.planning.breaks);
+  const segments = [];
+  const addSegment = (id, label, minutes, kind) => {
+    if (minutes > 0) {
+      segments.push({ id, label, minutes, kind });
+    }
+  };
+
+  let mainMinutes = getMinutes(state.planning.totalMinutes, state.planning.main);
+  const sideMinutes = getMinutes(state.planning.totalMinutes, state.planning.side);
+  const balanceMinutes = getMinutes(state.planning.totalMinutes, state.planning.balance);
+  const bufferMinutes = getMinutes(state.planning.totalMinutes, state.planning.buffer);
+  const mainLabel = `Hauptfokus: ${state.planning.mainFocus}`;
+
+  if (mainMinutes >= 90 && breakMinutes > 0) {
+    const firstHalf = Math.round(mainMinutes / 2);
+    const secondHalf = Math.max(0, mainMinutes - firstHalf);
+    const breakSlot = Math.min(10, breakMinutes);
+    addSegment("main-1", mainLabel, firstHalf, "main");
+    addSegment("pause-1", "Kurze Pause", breakSlot, "pause");
+    addSegment("main-2", mainLabel, secondHalf, "main");
+    mainMinutes = 0;
+  }
+
+  addSegment("main", mainLabel, mainMinutes, "main");
+
+  const remainingBreaks = Math.max(
+    0,
+    breakMinutes - segments.filter((segment) => segment.kind === "pause").reduce((sum, segment) => sum + segment.minutes, 0)
+  );
+
+  addSegment("side", formatSideFocusLabel(), sideMinutes, "side");
+  addSegment("breaks", "Pausen", remainingBreaks, "pause");
+  addSegment("balance", state.planning.balanceLabel || "Gegengewicht", balanceMinutes, "balance");
+  addSegment("buffer", "Puffer", bufferMinutes, "buffer");
+
+  return segments;
+}
+
+function renderSchedule() {
+  const segments = getScheduleSegments();
+  const start = new Date(state.scheduleStartTime || new Date().toISOString());
+  const items = buildScheduleItems(segments, start);
+
+  elements.scheduleResults.innerHTML = "";
+
+  if (items.length === 0) {
+    elements.scheduleCaption.textContent = "Der Ablaufplan erscheint, sobald die Summe genau 100 % ergibt.";
+    return;
+  }
+
+  elements.scheduleCaption.textContent = `Automatische Aufteilung ab ${formatTime(start)} Uhr.`;
+
+  items.forEach((item) => {
+    const row = document.createElement("div");
+    row.className = `schedule-row schedule-row-${item.kind}`;
+    row.innerHTML = `
+      <div>
+        <strong>${escapeHtml(item.label)}</strong>
+        <p>${item.minutes} Min</p>
+      </div>
+      <div class="schedule-time">${item.startLabel}–${item.endLabel}</div>
+    `;
+    elements.scheduleResults.appendChild(row);
+  });
+}
+
+function buildScheduleItems(segments, startTime) {
+  let cursor = new Date(startTime);
+
+  return segments.map((segment) => {
+    const start = new Date(cursor);
+    const end = new Date(cursor.getTime() + segment.minutes * 60000);
+    cursor = end;
+
+    return {
+      ...segment,
+      start,
+      end,
+      startLabel: formatTime(start),
+      endLabel: formatTime(end),
+    };
+  });
+}
+
+function exportScheduleAsICS() {
+  const items = buildScheduleItems(getScheduleSegments(), new Date(state.scheduleStartTime || new Date().toISOString()));
+
+  if (items.length === 0) {
+    return;
+  }
+
+  const nowStamp = formatICSDate(new Date());
+  const lines = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//Tagesplanung//DE",
+    "CALSCALE:GREGORIAN",
+  ];
+
+  items.forEach((item, index) => {
+    lines.push("BEGIN:VEVENT");
+    lines.push(`UID:tagesplanung-${item.id}-${index}-${nowStamp}`);
+    lines.push(`DTSTAMP:${nowStamp}`);
+    lines.push(`DTSTART:${formatICSDate(item.start)}`);
+    lines.push(`DTEND:${formatICSDate(item.end)}`);
+    lines.push(`SUMMARY:${item.label.replace(/,/g, "\\,")}`);
+    lines.push(`DESCRIPTION:Dauer ${item.minutes} Minuten`);
+    lines.push("END:VEVENT");
+  });
+
+  lines.push("END:VCALENDAR");
+
+  const blob = new Blob([lines.join("\r\n")], { type: "text/calendar;charset=utf-8" });
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `ablaufplan-${new Date().toISOString().slice(0, 10)}.ics`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  window.URL.revokeObjectURL(url);
+}
+
+function formatSideFocusLabel() {
+  if (state.planning.sideFocuses.length === 0) {
+    return "Nebenfokus";
+  }
+
+  return `Nebenfokus: ${state.planning.sideFocuses.join(", ")}`;
+}
+
+function getMinutes(totalMinutes, percent) {
+  return Math.round((Math.max(0, totalMinutes) * Math.max(0, percent)) / 100);
 }
 
 function renderRoutineFilters() {
@@ -456,7 +704,7 @@ function renderEditor() {
         renderRoutine();
       });
 
-      stepElement.querySelectorAll('input[data-mode]').forEach((checkbox) => {
+      stepElement.querySelectorAll("input[data-mode]").forEach((checkbox) => {
         checkbox.addEventListener("change", (event) => {
           updateStepModes(sectionIndex, stepIndex, event.target.dataset.mode, event.target.checked);
         });
@@ -554,6 +802,30 @@ function moveItem(list, fromIndex, toIndex) {
 
   const [item] = list.splice(fromIndex, 1);
   list.splice(toIndex, 0, item);
+}
+
+function sanitizeNumber(value) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function formatTime(date) {
+  return date.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" });
+}
+
+function formatICSDate(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const seconds = String(date.getSeconds()).padStart(2, "0");
+
+  return `${year}${month}${day}T${hours}${minutes}${seconds}`;
 }
 
 function createId(prefix) {

@@ -10,7 +10,7 @@ Die Seite lässt sich direkt über `index.html` im Browser öffnen.
 
 - `index.html` enthält die Oberfläche mit Tabs für Zeitplanung und Routinen.
 - `styles.css` enthält Layout, Farben und responsive Darstellung.
-- `app.js` enthält die Logik für Tabs, Zeitplanung, Routinen, Bearbeitungsmodus und `sessionStorage`.
+- `app.js` enthält die Logik für Tabs, Zeitplanung, Ablaufplan, `.ics`-Export, Routinen, Bearbeitungsmodus und `sessionStorage`.
 - `.nojekyll` verhindert unnötige Jekyll-Verarbeitung bei GitHub Pages.
 - `.github/workflows/pages.yml` veröffentlicht die statische Seite über GitHub Pages.
 - `agents.md` dokumentiert Projektkontext, Entscheidungen und den aktuellen Stand.
@@ -19,7 +19,9 @@ Die Seite lässt sich direkt über `index.html` im Browser öffnen.
 
 - Zeitplanung ist der Hauptbereich beim Öffnen der Seite.
 - Die Prozentverteilung startet mit `50 / 20 / 10 / 10 / 10`.
-- Die Summe muss genau `100 %` ergeben, bevor neu berechnet wird.
+- Hauptfokus, Nebenfokus und Gegengewicht können direkt in der Oberfläche festgelegt werden.
+- Die Zeitplanung erzeugt einen Ablaufplan mit Uhrzeiten ab jetzt und kann als `.ics` exportiert werden.
+- Die Summe muss genau `100 %` ergeben, damit der Ablaufplan angezeigt wird.
 - Die Routinen liegen auf derselben Startseite in einem zweiten Tab.
 - Der Zustand bleibt nur für die aktuelle Sitzung über `sessionStorage` erhalten.
 - Die Routine kann direkt in der Oberfläche bearbeitet werden.

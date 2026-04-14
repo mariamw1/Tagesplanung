@@ -115,7 +115,7 @@ Pflicht für alle nachfolgenden Agents:
 
 - `index.html` wurde zu einer zentralen Startseite mit Tabs für Zeitplanung und Routinen ausgebaut.
 - `styles.css` wurde zu einem responsiven Layout für Startseite, Kartenbereiche, Routinen und Bearbeitungsmodus erweitert.
-- `app.js` wurde angelegt und enthält die Logik für Tab-Wechsel, Zeitplanung, Routinen, Fortschritt, Bearbeitungsmodus und `sessionStorage`.
+- `app.js` wurde angelegt und enthält die Logik für Tab-Wechsel, Zeitplanung, Ablaufplan, `.ics`-Export, Routinen, Fortschritt, Bearbeitungsmodus und `sessionStorage`.
 - `.gitignore` wurde ergänzt, damit lokale Systemdateien nicht mit veröffentlicht werden.
 - `.nojekyll` wurde ergänzt.
 - `README.md` wurde für die Neustart-Version angelegt.
@@ -127,6 +127,8 @@ Pflicht für alle nachfolgenden Agents:
 - Die öffentliche Proof-of-Concept-URL ist `https://mariamw1.github.io/Tagesplanung/`.
 - Für den Kontotest wurde zwischenzeitlich eine vorherige Build-Version importiert; diese wurde anschließend wieder durch die einfache statische Projektstruktur ersetzt.
 - Die Zeitplanung startet jetzt mit `50 / 20 / 10 / 10 / 10` und prüft weiterhin, ob die Summe genau `100 %` ergibt.
+- Die Zeitplanung wurde wieder näher an die frühere, stärker ausgearbeitete Version herangeführt und enthält jetzt wieder Hauptfokus, Nebenfokus, Gegengewicht und einen Ablaufplan ab der aktuellen Zeit.
+- Der Ablaufplan der Zeitplanung kann wieder als `.ics` exportiert werden.
 - Die Routine ist jetzt wieder klarer nach Räumen und realem Ablauf gegliedert.
 - Die Schritte sind konkreter formuliert und können in der Oberfläche direkt bearbeitet, ergänzt, gelöscht und umsortiert werden.
 - Sichtbare Routine-Schritte zeigen nur die eigentlichen Handlungen; die Zuordnung zu Vollroutine, Minimalroutine und später nachholbaren Schritten steuert nur die Auswahl der Ansicht.
