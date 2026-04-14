@@ -93,8 +93,8 @@ Pflicht für alle nachfolgenden Agents:
 
 ## Offene Punkte
 
-- Ob das lokale Projekt nach dem Neustart erneut als Git-Repository initialisiert werden muss, ist abhängig vom tatsächlichen Stand im Ordner.
-- Ob der Push in das Ziel-Repository direkt aus dieser Umgebung möglich ist, muss praktisch geprüft werden.
+- Der lokale Projektordner wurde nach dem Neustart erneut als Git-Repository initialisiert.
+- Der Push in das Ziel-Repository ist aus dieser Umgebung aktuell noch blockiert, weil für `https://github.com` keine nutzbare Anmeldung hinterlegt ist.
 - Ob GitHub Pages ohne zusätzlichen manuellen Schritt sofort aktiv wird, muss nach dem Push geprüft werden.
 - Die spätere inhaltliche Struktur für Zeitplanung und Routinen bleibt offen.
 - Die genaue Form des Schnellzugriffs auf iPhone, iPad und Mac wird erst relevant, sobald eine feste URL aktiv ist.
@@ -116,18 +116,22 @@ Pflicht für alle nachfolgenden Agents:
 - `.nojekyll` wurde ergänzt.
 - `README.md` wurde für die Neustart-Version angelegt.
 - `.github/workflows/pages.yml` wurde ergänzt, damit die statische Seite nach einem Push über GitHub Pages veröffentlicht werden kann.
+- Das lokale Git-Repository wurde neu initialisiert, auf den Branch `main` gesetzt und mit dem Remote `origin` auf `https://github.com/mariamw1/Tagesplanung.git` verbunden.
+- Ein erster lokaler Commit für die Neustart-Minimalversion wurde erstellt.
+- Der Push auf `origin/main` konnte noch nicht abgeschlossen werden, weil in dieser Umgebung keine GitHub-Anmeldung für HTTPS verfügbar ist.
 - Die Struktur ist damit auf einen sehr kleinen, klaren Proof of Concept reduziert.
 
 ## Nächste sinnvolle Schritte
 
 - Prüfen, ob das lokale Projekt mit dem Ziel-Repository verbunden werden kann.
-- Die Minimalversion committen und in das Repository pushen.
+- Die vorhandene Minimalversion in das Repository pushen, sobald GitHub-Anmeldung oder ein anderer funktionierender Veröffentlichungsweg verfügbar ist.
 - Prüfen, ob die GitHub-Pages-Veröffentlichung erfolgreich läuft und welche URL aktiv ist.
 - Danach bei Bedarf schrittweise die erste echte Fachlogik ergänzen.
 
 ## Dinge, die der Nutzer selbst erledigen soll
 
 - Im Browser prüfen, ob die Minimalseite inhaltlich und visuell als Startpunkt passt.
+- Die lokale GitHub-Anmeldung so herstellen, dass `git push -u origin main` funktioniert, oder den bereits vorbereiteten Commit selbst pushen.
 - Falls GitHub Pages nicht automatisch aktiv wird, im Repository kurz prüfen, ob die Actions-Ausführung und die Pages-Freigabe vorhanden sind.
 - Die veröffentlichte URL auf iPhone, iPad und Mac öffnen und testen.
 - Einen Startbildschirm-Link oder vergleichbaren Schnellzugriff einrichten, sobald die feste URL funktioniert.
