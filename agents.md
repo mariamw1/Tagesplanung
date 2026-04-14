@@ -133,6 +133,9 @@ Pflicht für alle nachfolgenden Agents:
 - Die Fokus-Auswahl für Hauptfokus und Nebenfokus wurde technisch robuster gemacht, damit sie auch mit älteren Sitzungsdaten zuverlässig sichtbar bleibt.
 - Die Zwischenübersicht der Minutenblöcke wurde wieder entfernt, damit der Bereich direkter bleibt.
 - Im Ablaufplan stehen wieder Bedienknöpfe zum Verschieben und Splitten einzelner Blöcke.
+- Allgemeine Einstellungen stehen jetzt kompakter links, die Prozentverteilung rechts.
+- Die Zeitplanung zeigt jetzt zusätzlich direkt an, wann der Block ungefähr enden würde.
+- Geladene Sitzungsdaten für Zeitplanung und Routine werden robuster normalisiert, damit leere oder ältere Zustände die Oberfläche nicht mehr so leicht aushebeln.
 - Die Routine ist jetzt wieder klarer nach Räumen und realem Ablauf gegliedert.
 - Die Schritte sind konkreter formuliert und können in der Oberfläche direkt bearbeitet, ergänzt, gelöscht und umsortiert werden.
 - Sichtbare Routine-Schritte zeigen nur die eigentlichen Handlungen; die Zuordnung zu Vollroutine, Minimalroutine und später nachholbaren Schritten steuert nur die Auswahl der Ansicht.

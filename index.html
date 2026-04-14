@@ -33,45 +33,54 @@
           </div>
         </div>
 
-        <div class="planning-block">
-          <div class="planning-block-head">
-            <h3>Allgemeine Einstellungen</h3>
-            <p>Hier legst du Zeit, Hauptfokus, Nebenfokus und das Gegengewicht fest.</p>
-          </div>
+        <div class="planning-layout">
+          <div class="planning-block planning-block-general">
+            <div class="planning-block-head">
+              <h3>Allgemeine Einstellungen</h3>
+              <p>Hier legst du Zeit, Hauptfokus, Nebenfokus und das Gegengewicht fest.</p>
+            </div>
 
-          <div class="planning-grid planning-grid-general">
-            <label class="field">
-              <span>Gesamtzeit in Minuten</span>
-              <div class="time-control">
-                <input id="total-minutes-range" type="range" min="30" max="360" step="15" value="180">
-                <input id="total-minutes" type="number" min="0" step="5" value="180">
+            <div class="planning-grid planning-grid-general">
+              <label class="field">
+                <span>Gesamtzeit in Minuten</span>
+                <div class="time-control">
+                  <input id="total-minutes-range" type="range" min="30" max="360" step="15" value="180">
+                  <input id="total-minutes" type="number" min="0" step="5" value="180">
+                </div>
+              </label>
+
+              <div class="field field-compact">
+                <span class="field-label">Wenn du jetzt startest</span>
+                <div class="time-preview">
+                  <span class="time-preview-label">Ende ungefähr</span>
+                  <strong id="schedule-end-time">--:--</strong>
+                </div>
               </div>
-            </label>
 
-            <div class="field">
-              <span class="field-label">Hauptfokus</span>
-              <div id="main-focus-options" class="choice-list" role="radiogroup" aria-label="Hauptfokus auswählen"></div>
+              <div class="field">
+                <span class="field-label">Hauptfokus</span>
+                <div id="main-focus-options" class="choice-list" role="radiogroup" aria-label="Hauptfokus auswählen"></div>
+              </div>
+
+              <div class="field">
+                <span class="field-label">Nebenfokus</span>
+                <div id="side-focus-options" class="choice-list" aria-label="Nebenfokus auswählen"></div>
+              </div>
+
+              <label class="field">
+                <span>Gegengewicht</span>
+                <input id="balance-label" type="text" value="Bewegung oder Abwechslung">
+              </label>
             </div>
-
-            <div class="field">
-              <span class="field-label">Nebenfokus</span>
-              <div id="side-focus-options" class="choice-list" aria-label="Nebenfokus auswählen"></div>
-            </div>
-
-            <label class="field">
-              <span>Gegengewicht</span>
-              <input id="balance-label" type="text" value="Bewegung oder Abwechslung">
-            </label>
-          </div>
-        </div>
-
-        <div class="planning-block">
-          <div class="planning-block-head">
-            <h3>Prozentverteilung</h3>
-            <p>Diese Werte bestimmen, wie die Gesamtzeit auf die verschiedenen Blöcke verteilt wird.</p>
           </div>
 
-          <div class="planning-grid planning-grid-percent">
+          <div class="planning-block planning-block-percent">
+            <div class="planning-block-head">
+              <h3>Prozentverteilung</h3>
+              <p>Diese Werte bestimmen, wie die Gesamtzeit auf die verschiedenen Blöcke verteilt wird.</p>
+            </div>
+
+            <div class="planning-grid planning-grid-percent">
             <label class="field">
               <span>Hauptfokus %: <strong id="main-percent-label">50</strong></span>
               <input id="percent-main" type="range" min="0" max="100" step="5" value="50">
@@ -96,6 +105,7 @@
               <span>Puffer %: <strong id="buffer-percent-label">10</strong></span>
               <input id="percent-buffer" type="range" min="0" max="100" step="5" value="10">
             </label>
+            </div>
           </div>
         </div>
 

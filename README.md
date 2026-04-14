@@ -21,6 +21,8 @@ Die Seite lässt sich direkt über `index.html` im Browser öffnen.
 - Die Prozentverteilung startet mit `50 / 20 / 10 / 10 / 10`.
 - Hauptfokus, Nebenfokus und Gegengewicht können direkt in der Oberfläche festgelegt werden.
 - Allgemeine Einstellungen und Prozentverteilung sind in der Oberfläche voneinander getrennt.
+- Allgemeine Einstellungen stehen kompakt links, die Prozentverteilung rechts.
+- Beim Einstellen der Zeit ist direkt sichtbar, wann der Block ungefähr enden würde.
 - Die Zeitplanung erzeugt einen Ablaufplan mit Uhrzeiten ab jetzt und kann als `.ics` exportiert werden.
 - Der Ablaufplan kann direkt über Buttons pro Block umsortiert und gesplittet werden.
 - Die Summe muss genau `100 %` ergeben, damit der Ablaufplan angezeigt wird.

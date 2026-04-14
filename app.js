@@ -85,6 +85,7 @@ const elements = {
   breaksPercentLabel: document.getElementById("breaks-percent-label"),
   balancePercentLabel: document.getElementById("balance-percent-label"),
   bufferPercentLabel: document.getElementById("buffer-percent-label"),
+  scheduleEndTime: document.getElementById("schedule-end-time"),
   percentSummary: document.getElementById("percent-summary"),
   refreshScheduleButton: document.getElementById("refresh-schedule-button"),
   exportIcsButton: document.getElementById("export-ics-button"),
@@ -115,6 +116,7 @@ function loadState() {
   try {
     const parsed = JSON.parse(raw);
     const parsedPlanning = parsed.planning || {};
+    const normalizedRoutineSections = normalizeRoutineSections(parsed.routineSections);
 
     return {
       ...createDefaultState(),
@@ -130,9 +132,9 @@ function loadState() {
           ? parsedPlanning.balanceLabel
           : defaultPlanning.balanceLabel,
       },
-      routineSections: Array.isArray(parsed.routineSections)
-        ? parsed.routineSections
-        : cloneRoutineSections(defaultRoutineSections),
+      scheduleStartTime: typeof parsed.scheduleStartTime === "string" ? parsed.scheduleStartTime : new Date().toISOString(),
+      customScheduleSegments: normalizeScheduleSegments(parsed.customScheduleSegments),
+      routineSections: normalizedRoutineSections,
       completedSteps: Array.isArray(parsed.completedSteps) ? parsed.completedSteps : [],
     };
   } catch {
@@ -273,6 +275,9 @@ function syncPlanningInputs() {
   elements.breaksPercentLabel.textContent = state.planning.breaks;
   elements.balancePercentLabel.textContent = state.planning.balance;
   elements.bufferPercentLabel.textContent = state.planning.buffer;
+  elements.scheduleEndTime.textContent = getPlanningPercentSum() === 100
+    ? formatTime(new Date(new Date(state.scheduleStartTime || new Date().toISOString()).getTime() + state.planning.totalMinutes * 60000))
+    : "--:--";
 }
 
 function renderTabs() {
@@ -590,6 +595,12 @@ function renderRoutine() {
   elements.routineProgressBar.style.width = `${progress}%`;
   elements.routineProgressText.textContent = `${completedVisibleSteps.length} von ${visibleSteps.length} Schritten erledigt`;
 
+  if (visibleSections.length === 0) {
+    state.routineSections = cloneRoutineSections(defaultRoutineSections);
+    saveState();
+    return renderRoutine();
+  }
+
   visibleSections.forEach((section) => {
     const sectionElement = document.createElement("section");
     sectionElement.className = "routine-section";
@@ -866,6 +877,48 @@ function cloneRoutineSections(sections) {
 
 function cloneScheduleSegments(segments) {
   return JSON.parse(JSON.stringify(segments));
+}
+
+function normalizeRoutineSections(sections) {
+  if (!Array.isArray(sections)) {
+    return cloneRoutineSections(defaultRoutineSections);
+  }
+
+  const normalized = sections
+    .map((section) => ({
+      id: section && section.id ? String(section.id) : createId("section"),
+      title: section && typeof section.title === "string" && section.title.trim() ? section.title : "Raum",
+      steps: Array.isArray(section && section.steps)
+        ? section.steps
+            .map((step) => ({
+              id: step && step.id ? String(step.id) : createId("step"),
+              text: step && typeof step.text === "string" ? step.text : "",
+              note: step && typeof step.note === "string" ? step.note : "",
+              modes: Array.isArray(step && step.modes) && step.modes.length ? step.modes : ["full"],
+            }))
+            .filter((step) => step.text.trim())
+        : [],
+    }))
+    .filter((section) => section.steps.length > 0);
+
+  return normalized.length > 0 ? normalized : cloneRoutineSections(defaultRoutineSections);
+}
+
+function normalizeScheduleSegments(segments) {
+  if (!Array.isArray(segments) || segments.length === 0) {
+    return null;
+  }
+
+  const normalized = segments
+    .map((segment) => ({
+      id: segment && segment.id ? String(segment.id) : createId("segment"),
+      label: segment && typeof segment.label === "string" ? segment.label : "",
+      minutes: segment && Number.isFinite(Number(segment.minutes)) ? Number(segment.minutes) : 0,
+      kind: segment && typeof segment.kind === "string" ? segment.kind : "main",
+    }))
+    .filter((segment) => segment.label && segment.minutes > 0);
+
+  return normalized.length > 0 ? normalized : null;
 }
 
 function escapeHtml(value) {
