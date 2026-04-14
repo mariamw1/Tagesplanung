@@ -131,6 +131,8 @@ Pflicht für alle nachfolgenden Agents:
 - Der Ablaufplan der Zeitplanung kann wieder als `.ics` exportiert werden.
 - Die Zeitplanung trennt jetzt klarer zwischen allgemeinen Einstellungen und Prozentverteilung.
 - Die Fokus-Auswahl für Hauptfokus und Nebenfokus wurde technisch robuster gemacht, damit sie auch mit älteren Sitzungsdaten zuverlässig sichtbar bleibt.
+- Die Zwischenübersicht der Minutenblöcke wurde wieder entfernt, damit der Bereich direkter bleibt.
+- Im Ablaufplan stehen wieder Bedienknöpfe zum Verschieben und Splitten einzelner Blöcke.
 - Die Routine ist jetzt wieder klarer nach Räumen und realem Ablauf gegliedert.
 - Die Schritte sind konkreter formuliert und können in der Oberfläche direkt bearbeitet, ergänzt, gelöscht und umsortiert werden.
 - Sichtbare Routine-Schritte zeigen nur die eigentlichen Handlungen; die Zuordnung zu Vollroutine, Minimalroutine und später nachholbaren Schritten steuert nur die Auswahl der Ansicht.

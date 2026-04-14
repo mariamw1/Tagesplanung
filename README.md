@@ -22,6 +22,7 @@ Die Seite lässt sich direkt über `index.html` im Browser öffnen.
 - Hauptfokus, Nebenfokus und Gegengewicht können direkt in der Oberfläche festgelegt werden.
 - Allgemeine Einstellungen und Prozentverteilung sind in der Oberfläche voneinander getrennt.
 - Die Zeitplanung erzeugt einen Ablaufplan mit Uhrzeiten ab jetzt und kann als `.ics` exportiert werden.
+- Der Ablaufplan kann direkt über Buttons pro Block umsortiert und gesplittet werden.
 - Die Summe muss genau `100 %` ergeben, damit der Ablaufplan angezeigt wird.
 - Die Routinen liegen auf derselben Startseite in einem zweiten Tab.
 - Der Zustand bleibt nur für die aktuelle Sitzung über `sessionStorage` erhalten.

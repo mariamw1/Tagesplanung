@@ -89,7 +89,6 @@ const elements = {
   refreshScheduleButton: document.getElementById("refresh-schedule-button"),
   exportIcsButton: document.getElementById("export-ics-button"),
   resetPlanningButton: document.getElementById("reset-planning-button"),
-  planningResults: document.getElementById("planning-results"),
   scheduleCaption: document.getElementById("schedule-caption"),
   scheduleResults: document.getElementById("schedule-results"),
   routineFilterButtons: document.getElementById("routine-filter-buttons"),
@@ -146,6 +145,7 @@ function createDefaultState() {
     activeTab: "planung",
     planning: { ...defaultPlanning },
     scheduleStartTime: new Date().toISOString(),
+    customScheduleSegments: null,
     routineMode: "full",
     completedSteps: [],
     routineSections: cloneRoutineSections(defaultRoutineSections),
@@ -168,6 +168,7 @@ function bindEvents() {
 
   elements.totalMinutes.addEventListener("input", (event) => {
     state.planning.totalMinutes = sanitizeNumber(event.target.value);
+    state.customScheduleSegments = null;
     saveState();
     syncPlanningInputs();
     renderPlanning();
@@ -175,6 +176,7 @@ function bindEvents() {
 
   elements.totalMinutesRange.addEventListener("input", (event) => {
     state.planning.totalMinutes = sanitizeNumber(event.target.value);
+    state.customScheduleSegments = null;
     saveState();
     syncPlanningInputs();
     renderPlanning();
@@ -189,6 +191,7 @@ function bindEvents() {
   ].forEach(([elementKey, stateKey]) => {
     elements[elementKey].addEventListener("input", (event) => {
       state.planning[stateKey] = sanitizeNumber(event.target.value);
+      state.customScheduleSegments = null;
       saveState();
       renderPlanning();
     });
@@ -196,12 +199,14 @@ function bindEvents() {
 
   elements.balanceLabel.addEventListener("input", (event) => {
     state.planning.balanceLabel = event.target.value;
+    state.customScheduleSegments = null;
     saveState();
     renderPlanning();
   });
 
   elements.refreshScheduleButton.addEventListener("click", () => {
     state.scheduleStartTime = new Date().toISOString();
+    state.customScheduleSegments = null;
     saveState();
     renderSchedule();
   });
@@ -213,6 +218,7 @@ function bindEvents() {
   elements.resetPlanningButton.addEventListener("click", () => {
     state.planning = { ...defaultPlanning };
     state.scheduleStartTime = new Date().toISOString();
+    state.customScheduleSegments = null;
     saveState();
     syncPlanningInputs();
     renderPlanningFocusOptions();
@@ -324,7 +330,6 @@ function renderPlanning() {
   syncPlanningInputs();
   renderPlanningFocusOptions();
   renderPlanningSummary();
-  renderPlanningResults();
   renderSchedule();
 }
 
@@ -349,55 +354,7 @@ function renderPlanningSummary() {
   }
 }
 
-function getPlanItems() {
-  return [
-    {
-      label: `Hauptfokus: ${state.planning.mainFocus}`,
-      note: "Wichtigster Block des Tages",
-      minutes: getMinutes(state.planning.totalMinutes, state.planning.main),
-    },
-    {
-      label: formatSideFocusLabel(),
-      note: "Zweiter klarer Arbeitsblock",
-      minutes: getMinutes(state.planning.totalMinutes, state.planning.side),
-    },
-    {
-      label: "Pausen",
-      note: "Kurze Unterbrechungen zum Durchatmen",
-      minutes: getMinutes(state.planning.totalMinutes, state.planning.breaks),
-    },
-    {
-      label: state.planning.balanceLabel || "Gegengewicht",
-      note: "Bewegung, Abwechslung oder ein guter Gegenschwerpunkt",
-      minutes: getMinutes(state.planning.totalMinutes, state.planning.balance),
-    },
-    {
-      label: "Puffer",
-      note: "Falls etwas länger dauert als gedacht",
-      minutes: getMinutes(state.planning.totalMinutes, state.planning.buffer),
-    },
-  ];
-}
-
-function renderPlanningResults() {
-  const items = getPlanItems();
-  elements.planningResults.innerHTML = "";
-
-  items.forEach((item) => {
-    const row = document.createElement("div");
-    row.className = "result-item";
-    row.innerHTML = `
-      <div>
-        <strong>${escapeHtml(item.label)}</strong>
-        <p class="result-item-note">${escapeHtml(item.note)}</p>
-      </div>
-      <strong>${item.minutes} Min</strong>
-    `;
-    elements.planningResults.appendChild(row);
-  });
-}
-
-function getScheduleSegments() {
+function getGeneratedScheduleSegments() {
   if (getPlanningPercentSum() !== 100) {
     return [];
   }
@@ -442,7 +399,7 @@ function getScheduleSegments() {
 }
 
 function renderSchedule() {
-  const segments = getScheduleSegments();
+  const segments = state.customScheduleSegments || getGeneratedScheduleSegments();
   const start = new Date(state.scheduleStartTime || new Date().toISOString());
   const items = buildScheduleItems(segments, start);
 
@@ -459,12 +416,22 @@ function renderSchedule() {
     const row = document.createElement("div");
     row.className = `schedule-row schedule-row-${item.kind}`;
     row.innerHTML = `
-      <div>
+      <div class="schedule-content">
         <strong>${escapeHtml(item.label)}</strong>
         <p>${item.minutes} Min</p>
       </div>
-      <div class="schedule-time">${item.startLabel}–${item.endLabel}</div>
+      <div class="schedule-actions">
+        <div class="schedule-time">${item.startLabel}–${item.endLabel}</div>
+        <div class="schedule-move-buttons">
+          <button type="button" data-action="up" ${canMoveScheduleItem(items, item.id, "up") ? "" : "disabled"}>↑</button>
+          <button type="button" data-action="down" ${canMoveScheduleItem(items, item.id, "down") ? "" : "disabled"}>↓</button>
+          <button type="button" data-action="split" ${item.minutes >= 10 ? "" : "disabled"}>Split</button>
+        </div>
+      </div>
     `;
+    row.querySelector('[data-action="up"]').addEventListener("click", () => moveScheduleItem(item.id, "up"));
+    row.querySelector('[data-action="down"]').addEventListener("click", () => moveScheduleItem(item.id, "down"));
+    row.querySelector('[data-action="split"]').addEventListener("click", () => splitScheduleItem(item.id));
     elements.scheduleResults.appendChild(row);
   });
 }
@@ -488,7 +455,8 @@ function buildScheduleItems(segments, startTime) {
 }
 
 function exportScheduleAsICS() {
-  const items = buildScheduleItems(getScheduleSegments(), new Date(state.scheduleStartTime || new Date().toISOString()));
+  const sourceSegments = state.customScheduleSegments || getGeneratedScheduleSegments();
+  const items = buildScheduleItems(sourceSegments, new Date(state.scheduleStartTime || new Date().toISOString()));
 
   if (items.length === 0) {
     return;
@@ -524,6 +492,56 @@ function exportScheduleAsICS() {
   link.click();
   document.body.removeChild(link);
   window.URL.revokeObjectURL(url);
+}
+
+function canMoveScheduleItem(items, itemId, direction) {
+  const index = items.findIndex((item) => item.id === itemId);
+  if (index === -1) return false;
+  return direction === "up" ? index > 0 : index < items.length - 1;
+}
+
+function moveScheduleItem(itemId, direction) {
+  const source = cloneScheduleSegments(state.customScheduleSegments || getGeneratedScheduleSegments());
+  const index = source.findIndex((item) => item.id === itemId);
+  const targetIndex = direction === "up" ? index - 1 : index + 1;
+
+  if (index === -1 || targetIndex < 0 || targetIndex >= source.length) {
+    return;
+  }
+
+  const [item] = source.splice(index, 1);
+  source.splice(targetIndex, 0, item);
+  state.customScheduleSegments = source;
+  saveState();
+  renderSchedule();
+}
+
+function splitScheduleItem(itemId) {
+  const source = cloneScheduleSegments(state.customScheduleSegments || getGeneratedScheduleSegments());
+  const index = source.findIndex((item) => item.id === itemId);
+  const item = source[index];
+
+  if (!item || item.minutes < 10) {
+    return;
+  }
+
+  const firstMinutes = Math.floor(item.minutes / 2);
+  const secondMinutes = item.minutes - firstMinutes;
+
+  if (firstMinutes <= 0 || secondMinutes <= 0) {
+    return;
+  }
+
+  source.splice(
+    index,
+    1,
+    { ...item, id: `${item.id}-a`, minutes: firstMinutes },
+    { ...item, id: `${item.id}-b`, minutes: secondMinutes }
+  );
+
+  state.customScheduleSegments = source;
+  saveState();
+  renderSchedule();
 }
 
 function formatSideFocusLabel() {
@@ -844,6 +862,10 @@ function createId(prefix) {
 
 function cloneRoutineSections(sections) {
   return JSON.parse(JSON.stringify(sections));
+}
+
+function cloneScheduleSegments(segments) {
+  return JSON.parse(JSON.stringify(segments));
 }
 
 function escapeHtml(value) {
