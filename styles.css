@@ -69,8 +69,10 @@ input {
 }
 
 .hero {
-  width: 100%;
-  padding: 12px 6px 32px;
+  width: calc(100vw - 48px);
+  max-width: none;
+  margin-left: calc(50% - 50vw + 24px);
+  padding: 12px 24px 32px;
   display: grid;
   gap: 10px;
 }
@@ -88,11 +90,12 @@ input {
   font-size: clamp(2.2rem, 5vw, 4rem);
   line-height: 1.04;
   max-width: none;
+  width: min(100%, 1200px);
 }
 
 .intro {
   margin: 0;
-  width: 100%;
+  width: min(100%, 1200px);
   max-width: none;
   line-height: 1.7;
   color: var(--muted);
@@ -590,6 +593,12 @@ input {
 @media (max-width: 780px) {
   .app-shell {
     padding-inline: 14px;
+  }
+
+  .hero {
+    width: 100%;
+    margin-left: 0;
+    padding-inline: 0;
   }
 
   .planning-grid,

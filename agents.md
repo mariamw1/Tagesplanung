@@ -139,6 +139,7 @@ Pflicht für alle nachfolgenden Agents:
 - Der Kopfbereich oben wurde breiter geöffnet, damit Überschrift und Einführungstext nicht mehr so zusammengedrückt wirken.
 - Zusätzlich wurde die maximale Seitenbreite erhöht, damit der Einführungstext oben deutlich freier über die verfügbare Breite laufen kann.
 - Die feste Zeichenbegrenzung der großen Überschrift im Kopfbereich wurde entfernt, damit der Titel selbst nicht mehr unnötig schmal umbrechen muss.
+- Der obere Kopfbereich wurde zusätzlich aus der normalen Inhaltsbreite herausgelöst, damit Überschrift und Einleitung fast über die gesamte verfügbare Seitenbreite laufen können.
 - Die Routine ist jetzt wieder klarer nach Räumen und realem Ablauf gegliedert.
 - Die Schritte sind konkreter formuliert und können in der Oberfläche direkt bearbeitet, ergänzt, gelöscht und umsortiert werden.
 - Sichtbare Routine-Schritte zeigen nur die eigentlichen Handlungen; die Zuordnung zu Vollroutine, Minimalroutine und später nachholbaren Schritten steuert nur die Auswahl der Ansicht.
