@@ -20,6 +20,7 @@ Die Seite lässt sich direkt über `index.html` im Browser öffnen.
 - Zeitplanung ist der Hauptbereich beim Öffnen der Seite.
 - Die Prozentverteilung startet mit `50 / 20 / 10 / 10 / 10`.
 - Hauptfokus, Nebenfokus und Gegengewicht können direkt in der Oberfläche festgelegt werden.
+- Allgemeine Einstellungen und Prozentverteilung sind in der Oberfläche voneinander getrennt.
 - Die Zeitplanung erzeugt einen Ablaufplan mit Uhrzeiten ab jetzt und kann als `.ics` exportiert werden.
 - Die Summe muss genau `100 %` ergeben, damit der Ablaufplan angezeigt wird.
 - Die Routinen liegen auf derselben Startseite in einem zweiten Tab.

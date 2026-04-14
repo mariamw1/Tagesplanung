@@ -129,6 +129,8 @@ Pflicht für alle nachfolgenden Agents:
 - Die Zeitplanung startet jetzt mit `50 / 20 / 10 / 10 / 10` und prüft weiterhin, ob die Summe genau `100 %` ergibt.
 - Die Zeitplanung wurde wieder näher an die frühere, stärker ausgearbeitete Version herangeführt und enthält jetzt wieder Hauptfokus, Nebenfokus, Gegengewicht und einen Ablaufplan ab der aktuellen Zeit.
 - Der Ablaufplan der Zeitplanung kann wieder als `.ics` exportiert werden.
+- Die Zeitplanung trennt jetzt klarer zwischen allgemeinen Einstellungen und Prozentverteilung.
+- Die Fokus-Auswahl für Hauptfokus und Nebenfokus wurde technisch robuster gemacht, damit sie auch mit älteren Sitzungsdaten zuverlässig sichtbar bleibt.
 - Die Routine ist jetzt wieder klarer nach Räumen und realem Ablauf gegliedert.
 - Die Schritte sind konkreter formuliert und können in der Oberfläche direkt bearbeitet, ergänzt, gelöscht und umsortiert werden.
 - Sichtbare Routine-Schritte zeigen nur die eigentlichen Handlungen; die Zuordnung zu Vollroutine, Minimalroutine und später nachholbaren Schritten steuert nur die Auswahl der Ansicht.

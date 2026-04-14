@@ -115,12 +115,21 @@ function loadState() {
 
   try {
     const parsed = JSON.parse(raw);
+    const parsedPlanning = parsed.planning || {};
+
     return {
       ...createDefaultState(),
       ...parsed,
       planning: {
         ...defaultPlanning,
-        ...(parsed.planning || {}),
+        ...parsedPlanning,
+        mainFocus: focusOptions.includes(parsedPlanning.mainFocus) ? parsedPlanning.mainFocus : defaultPlanning.mainFocus,
+        sideFocuses: Array.isArray(parsedPlanning.sideFocuses)
+          ? parsedPlanning.sideFocuses.filter((item) => focusOptions.includes(item))
+          : [...defaultPlanning.sideFocuses],
+        balanceLabel: typeof parsedPlanning.balanceLabel === "string"
+          ? parsedPlanning.balanceLabel
+          : defaultPlanning.balanceLabel,
       },
       routineSections: Array.isArray(parsed.routineSections)
         ? parsed.routineSections
@@ -313,6 +322,7 @@ function renderPlanningFocusOptions() {
 
 function renderPlanning() {
   syncPlanningInputs();
+  renderPlanningFocusOptions();
   renderPlanningSummary();
   renderPlanningResults();
   renderSchedule();
